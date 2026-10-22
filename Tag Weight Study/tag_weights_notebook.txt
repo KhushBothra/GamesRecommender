@@ -1,0 +1,38 @@
+def weight_tags(tags):
+    """Return (tag, weight) pairs. Supply tags from most to least important.
+
+    Standalone: no repository files or external packages are required.
+    Order and duplicate tags are preserved. Empty lists return []; a single
+    tag receives weight 1. Lengths above 21 use extrapolated weights.
+    """
+    import math
+
+    if not isinstance(tags, (list, tuple)):
+        raise TypeError("Provide a list of tag strings.")
+    if any(not isinstance(tag, str) for tag in tags):
+        raise TypeError("Every tag must be a string.")
+
+    k = len(tags)
+    if k == 0:
+        return []
+    if k == 1:
+        return [(tags[0], 1.0)]
+
+    # Coefficients from the fitted length-aware exponential model.
+    a = 2.249150856857026
+    b = 0.0946333263878718
+
+    decay_rate = -a * math.expm1(-b * (k - 1))
+
+    return [
+        (tag, math.exp(-decay_rate * rank / (k - 1)))
+        for rank, tag in enumerate(tags)
+    ]
+
+
+# Example: paste this entire file into a notebook cell and run it.
+weighted_tags = weight_tags(["Action", "Adventure", "Indie"])
+print(weighted_tags)
+# [('Action', 1.0),
+#  ('Adventure', 0.8237277046376448),
+#  ('Indie', 0.6785273313876029)]

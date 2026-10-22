@@ -1,0 +1,22 @@
+{
+  "comparison": "length_saturating_exponential minus per_length_exponential",
+  "replicates": 2000,
+  "seed": 20261024,
+  "positive_means": "smooth model has higher MSE",
+  "method": "paired bootstrap of test games within each length; equal length weighting",
+  "limits": "Conditional on the fitted models; excludes training/selection uncertainty and new datasets.",
+  "results": {
+    "all_lengths": {
+      "mse_difference": 0.00029457845072003897,
+      "ci95_lower": 5.653080186532337e-05,
+      "ci95_upper": 0.0005457595293717664,
+      "interval_includes_zero": false
+    },
+    "without_k21": {
+      "mse_difference": 0.0002609370352958607,
+      "ci95_lower": 5.6045928270757796e-05,
+      "ci95_upper": 0.00048300084493006746,
+      "interval_includes_zero": false
+    }
+  }
+}

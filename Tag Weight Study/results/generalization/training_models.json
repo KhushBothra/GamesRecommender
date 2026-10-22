@@ -1,0 +1,95 @@
+[
+  {
+    "name": "shared_linear",
+    "parameters": {
+      "parameter": 0.7074848700455192
+    },
+    "n_parameters": 1
+  },
+  {
+    "name": "shared_exponential",
+    "parameters": {
+      "parameter": 1.1015877474947438
+    },
+    "n_parameters": 1
+  },
+  {
+    "name": "shared_logarithmic",
+    "parameters": {
+      "parameter": 0.6760021064129411
+    },
+    "n_parameters": 1
+  },
+  {
+    "name": "shared_power",
+    "parameters": {
+      "parameter": 1.4519007728784659
+    },
+    "n_parameters": 1
+  },
+  {
+    "name": "per_length_exponential",
+    "n_parameters": 20,
+    "parameters": {
+      "2": 0.28199300911402214,
+      "3": 0.38246518627146747,
+      "4": 0.5128914181495994,
+      "5": 0.6536566458489417,
+      "6": 0.7718255361360203,
+      "7": 0.9665174747789812,
+      "8": 1.0868656110345338,
+      "9": 1.2337690293900674,
+      "10": 1.291793145786683,
+      "11": 1.3815752931192025,
+      "12": 1.5296800996563613,
+      "13": 1.5341111557368234,
+      "14": 1.6263186593765195,
+      "15": 1.6554303724812822,
+      "16": 1.7219417372481862,
+      "17": 1.8133233884450173,
+      "18": 1.8540981312246576,
+      "19": 1.6564373915043245,
+      "20": 1.8842961962752554,
+      "21": 1.7832869266182296
+    }
+  },
+  {
+    "name": "raw_rank_exponential",
+    "parameters": {
+      "beta": 0.12986056663470175
+    },
+    "n_parameters": 1,
+    "rate_equation": "lambda(k) = beta*(k-1)",
+    "weight_equation": "w(r,k) = exp(-lambda(k)*(r-1)/(k-1))"
+  },
+  {
+    "name": "length_affine_exponential",
+    "parameters": {
+      "a": 0.23022660205507048,
+      "b": 0.10243829744625667
+    },
+    "n_parameters": 2,
+    "rate_equation": "lambda(k) = a + b*(k-1)",
+    "weight_equation": "w(r,k) = exp(-lambda(k)*(r-1)/(k-1))"
+  },
+  {
+    "name": "length_power_exponential",
+    "parameters": {
+      "a": 0.2726231732230399,
+      "b": 0.6775309753116711
+    },
+    "n_parameters": 2,
+    "rate_equation": "lambda(k) = a*(k-1)^b",
+    "weight_equation": "w(r,k) = exp(-lambda(k)*(r-1)/(k-1))"
+  },
+  {
+    "name": "length_saturating_exponential",
+    "parameters": {
+      "a": 2.2072768579717916,
+      "b": 0.0969780937258659
+    },
+    "n_parameters": 2,
+    "rate_equation": "lambda(k) = a*(1-exp(-b*(k-1)))",
+    "weight_equation": "w(r,k) = exp(-lambda(k)*(r-1)/(k-1))"
+  }
+]

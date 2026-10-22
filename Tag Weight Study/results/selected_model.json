@@ -1,0 +1,29 @@
+{
+  "family": "power",
+  "parameter_name": "p",
+  "parameter": 1.4585009019741912,
+  "equation": "w(r,k) = (1+x)^(-p)",
+  "position": "x=(r-1)/(k-1) for k>1",
+  "zero_tags": [],
+  "one_tag": [
+    1.0
+  ],
+  "fit_type": "shared",
+  "calibrated_n_tags_min": 2,
+  "calibrated_n_tags_max": 21,
+  "longer_lists": "Evaluate normalized position without truncation; extrapolation beyond calibration.",
+  "selection_metric": "group_balanced_mse",
+  "scores": {
+    "scenario": "all_groups",
+    "fit_type": "shared",
+    "family": "power",
+    "n_groups": 20,
+    "n_games": 27688,
+    "n_parameters": 1,
+    "group_balanced_mse": 0.02749533925510227,
+    "group_balanced_rmse": 0.16581718624769348,
+    "sample_weighted_mse": 0.04529494848351864,
+    "sample_weighted_rmse": 0.21282609915966286,
+    "rank": 1
+  }
+}

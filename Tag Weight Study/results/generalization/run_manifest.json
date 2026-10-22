@@ -1,0 +1,27 @@
+{
+  "source_rows": 29022,
+  "tag_columns": 371,
+  "maximum_empirical_mean_difference": 0.0,
+  "input_sha256": {
+    "Tag Weights DB/steamspy_tag_data.csv": "98b8fb0120177f7292755119bccbdde6387a9c0c90979593dd0d6c0dc791b183",
+    "steamspy_tag_data_indexed.csv": "c2875cc1d08391589d639c81e7b552c264522c2e8c7da2fa1fdbf93aca4debf7",
+    "steamspy_average_decay_by_n_tags.csv": "bfe9f92d4c98aec04bda178885dd682663bbc134229c91605cbd1d71dc67e5eb"
+  },
+  "seed": 20261023,
+  "split": "within-length train=floor(0.6*N), validation=floor(0.2*N), test=remainder",
+  "rng": "numpy.default_rng/PCG64; groups sorted by length; rows sorted by AppID",
+  "selection_metric": "validation mean_curve_group_balanced_mse",
+  "selected_smooth": "length_saturating_exponential",
+  "selected_overall": "per_length_exponential",
+  "test_used_for_fitting_or_selection": false,
+  "all_data_refit_separate_from_evaluated_models": true,
+  "python": "3.12.14",
+  "packages": {
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "pandas": "3.1.0",
+    "matplotlib": "3.11.2"
+  },
+  "script_sha256": "ee7bf1f0bd1b75ce08fbb290954ee6e625dc74c9b2d23ba2ca5444e875109eb3",
+  "fitting_module_sha256": "9fc842d71bc410b0e24661889b6b39c8bfd120c73cf4a8383fd63ee2d87c1015"
+}

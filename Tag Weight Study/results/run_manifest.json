@@ -1,0 +1,111 @@
+{
+  "source_rows": 29022,
+  "tag_columns": 371,
+  "maximum_empirical_mean_difference": 0.0,
+  "input_sha256": {
+    "Tag Weights DB/steamspy_tag_data.csv": "98b8fb0120177f7292755119bccbdde6387a9c0c90979593dd0d6c0dc791b183",
+    "steamspy_tag_data_indexed.csv": "c2875cc1d08391589d639c81e7b552c264522c2e8c7da2fa1fdbf93aca4debf7",
+    "steamspy_average_decay_by_n_tags.csv": "bfe9f92d4c98aec04bda178885dd682663bbc134229c91605cbd1d71dc67e5eb"
+  },
+  "python": "3.12.14",
+  "packages": {
+    "numpy": "2.5.4",
+    "pandas": "3.1.0",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.2"
+  },
+  "script_sha256": "9fc842d71bc410b0e24661889b6b39c8bfd120c73cf4a8383fd63ee2d87c1015",
+  "fit_objective": "mean_k(mean_r((prediction-target)^2)); r=2..k; k>=2",
+  "sensitivity": "refit after removing k=21; evaluate same parameters for sample weighting",
+  "selection": "lowest full-data shared group-balanced MSE",
+  "groups": [
+    {
+      "n_tags": 0,
+      "n_games": 575
+    },
+    {
+      "n_tags": 1,
+      "n_games": 759
+    },
+    {
+      "n_tags": 2,
+      "n_games": 2312
+    },
+    {
+      "n_tags": 3,
+      "n_games": 4100
+    },
+    {
+      "n_tags": 4,
+      "n_games": 3893
+    },
+    {
+      "n_tags": 5,
+      "n_games": 3037
+    },
+    {
+      "n_tags": 6,
+      "n_games": 2386
+    },
+    {
+      "n_tags": 7,
+      "n_games": 1791
+    },
+    {
+      "n_tags": 8,
+      "n_games": 1391
+    },
+    {
+      "n_tags": 9,
+      "n_games": 1097
+    },
+    {
+      "n_tags": 10,
+      "n_games": 924
+    },
+    {
+      "n_tags": 11,
+      "n_games": 771
+    },
+    {
+      "n_tags": 12,
+      "n_games": 677
+    },
+    {
+      "n_tags": 13,
+      "n_games": 535
+    },
+    {
+      "n_tags": 14,
+      "n_games": 486
+    },
+    {
+      "n_tags": 15,
+      "n_games": 419
+    },
+    {
+      "n_tags": 16,
+      "n_games": 417
+    },
+    {
+      "n_tags": 17,
+      "n_games": 358
+    },
+    {
+      "n_tags": 18,
+      "n_games": 343
+    },
+    {
+      "n_tags": 19,
+      "n_games": 514
+    },
+    {
+      "n_tags": 20,
+      "n_games": 2225
+    },
+    {
+      "n_tags": 21,
+      "n_games": 12
+    }
+  ]
+}

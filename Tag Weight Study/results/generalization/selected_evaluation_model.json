@@ -1,0 +1,10 @@
+{
+  "name": "length_saturating_exponential",
+  "parameters": {
+    "a": 2.2072768579717916,
+    "b": 0.0969780937258659
+  },
+  "n_parameters": 2,
+  "rate_equation": "lambda(k) = a*(1-exp(-b*(k-1)))",
+  "weight_equation": "w(r,k) = exp(-lambda(k)*(r-1)/(k-1))"
+}

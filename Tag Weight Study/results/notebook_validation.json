@@ -1,0 +1,26 @@
+{
+  "code_cells_executed": 23,
+  "cell_errors": 0,
+  "all_empirical_inputs_preserved": true,
+  "cli_notebook_numerical_outputs_identical": true,
+  "compared_outputs": {
+    "model_scores.csv": "60c4dafcc702f9c3518fa16178f3410b674d1c816ea307c4c1a9fbdb1798c4b5",
+    "fitted_parameters.csv": "ca03b720cee4b78f087f7c83f298ca7040bc0676e69f53684fe45b1ae1bf17a8",
+    "per_group_errors.csv": "0dd79c3b7469abd4cfc6a92bafbbe233ffe99f1390e358bb318c3092a344e226",
+    "predictions.csv": "2c32ab9285fb3e6d6a402a86167ec7bc98d9c4790f71a7973779a55f7b91059f",
+    "empirical_targets.csv": "5833b53c81c972729377eed3f0fe3cf965f04706ed5de6bd19d5c7bbc1467eac",
+    "selected_model.json": "e100c3092e486240054f32bac9846fa5a5dbadc119abeef2cb31c3e7ba46ee95",
+    "generalization/model_scores.csv": "a00c82fd426ce02655547fcc0f26a73e0a3a4c6b6d261a759f11b18e8abb68a1",
+    "generalization/per_group_errors.csv": "672c5417d3b4d0d6abbefb1bfe7ccebd9747bf589682bc729ac5e02c074f3a04",
+    "generalization/predictions.csv": "867a3046f6274f9220ca1cabca78a61f4bcb86b6c0fe32bdda4bc98b0d81a0b7",
+    "generalization/split_assignments.csv": "20af170644ad328f55fe93c9d3eee26c14b5599e685e16fbf1b7cb4e7ce3626d",
+    "generalization/split_targets.csv": "6b38090153717c469fa83a5c891da37ca200984d2b4b97fb58f743edfa18c9d1",
+    "generalization/length_rates.csv": "6a7cade015d9bee4cbe0443fb38c78389f81036f0439736c74b5f6aeec4e8121",
+    "generalization/leave_length_out_errors.csv": "d876490c61404d70530c30e2fabd0d18ccacfa960a603f12e7e31228f0ba1942",
+    "generalization/training_models.json": "c89fd67bfaff12d679f770d864e6c830d5c7e1dace19b6cb9d394dcf895115f1",
+    "generalization/selected_evaluation_model.json": "710c9db880ff63006cc62c77e9cd7c244cda9d8d83f77e02641cc43bd58848ad",
+    "generalization/selected_length_aware_model.json": "9da93ff4ead0dca0305c64f68029c67862f9d385cba17295f496030ac48b468a",
+    "generalization/paired_bootstrap.json": "157e603291f8f213420da256098b02ea96dd7ce8a099b86cc85e00bf4684e82e",
+    "generalization/run_manifest.json": "56d0bf7dded2526f9974dd63b94b3c97ca030454932f885f6a1d139a11d36a46"
+  }
+}

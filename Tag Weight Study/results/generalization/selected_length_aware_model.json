@@ -1,0 +1,19 @@
+{
+  "name": "length_saturating_exponential",
+  "parameters": {
+    "a": 2.249150856857026,
+    "b": 0.0946333263878718
+  },
+  "n_parameters": 2,
+  "rate_equation": "lambda(k) = a*(1-exp(-b*(k-1)))",
+  "weight_equation": "w(r,k) = exp(-lambda(k)*(r-1)/(k-1))",
+  "fit_data": "all games; refitted after frozen holdout evaluation",
+  "selected_using": "validation mean-curve group-balanced MSE",
+  "calibrated_n_tags_min": 2,
+  "calibrated_n_tags_max": 21,
+  "longer_lists": "Evaluate the rate formula without truncation; extrapolation.",
+  "zero_tags": [],
+  "one_tag": [
+    1.0
+  ]
+}
