@@ -1,0 +1,304 @@
+{
+  "plan": {
+    "combinations": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "cluster_counts": [
+      2,
+      3,
+      5,
+      8,
+      13,
+      21,
+      34
+    ],
+    "seeds": [
+      42
+    ],
+    "configurations": 28,
+    "fits_including_seeds": 28,
+    "rows": 114958,
+    "source_rows": 114958,
+    "subset_experiment": false,
+    "weights": {
+      "A": {
+        "categorical": 1.0,
+        "description": 0.0,
+        "popularity": 0.0
+      },
+      "B": {
+        "categorical": 0.8571428571428571,
+        "description": 0.0,
+        "popularity": 0.14285714285714285
+      },
+      "C": {
+        "categorical": 0.6666666666666666,
+        "description": 0.3333333333333333,
+        "popularity": 0.0
+      },
+      "D": {
+        "categorical": 0.6,
+        "description": 0.3,
+        "popularity": 0.1
+      }
+    }
+  },
+  "completed_fits": 28,
+  "runs": [
+    {
+      "combination": "A",
+      "n_clusters": 2,
+      "random_seed": 42,
+      "inertia": 67279.125,
+      "iterations": 14,
+      "max_iter_reached": false,
+      "fit_seconds": 7.826
+    },
+    {
+      "combination": "A",
+      "n_clusters": 3,
+      "random_seed": 42,
+      "inertia": 64161.4375,
+      "iterations": 23,
+      "max_iter_reached": false,
+      "fit_seconds": 9.564
+    },
+    {
+      "combination": "A",
+      "n_clusters": 5,
+      "random_seed": 42,
+      "inertia": 60678.51953125,
+      "iterations": 26,
+      "max_iter_reached": false,
+      "fit_seconds": 15.161
+    },
+    {
+      "combination": "A",
+      "n_clusters": 8,
+      "random_seed": 42,
+      "inertia": 57178.93359375,
+      "iterations": 42,
+      "max_iter_reached": false,
+      "fit_seconds": 22.66
+    },
+    {
+      "combination": "A",
+      "n_clusters": 13,
+      "random_seed": 42,
+      "inertia": 53376.98046875,
+      "iterations": 36,
+      "max_iter_reached": false,
+      "fit_seconds": 35.06
+    },
+    {
+      "combination": "A",
+      "n_clusters": 21,
+      "random_seed": 42,
+      "inertia": 50133.55859375,
+      "iterations": 54,
+      "max_iter_reached": false,
+      "fit_seconds": 56.84
+    },
+    {
+      "combination": "A",
+      "n_clusters": 34,
+      "random_seed": 42,
+      "inertia": 47246.5546875,
+      "iterations": 75,
+      "max_iter_reached": false,
+      "fit_seconds": 88.0
+    },
+    {
+      "combination": "B",
+      "n_clusters": 2,
+      "random_seed": 42,
+      "inertia": 57836.4453125,
+      "iterations": 11,
+      "max_iter_reached": false,
+      "fit_seconds": 8.024
+    },
+    {
+      "combination": "B",
+      "n_clusters": 3,
+      "random_seed": 42,
+      "inertia": 55084.546875,
+      "iterations": 27,
+      "max_iter_reached": false,
+      "fit_seconds": 10.59
+    },
+    {
+      "combination": "B",
+      "n_clusters": 5,
+      "random_seed": 42,
+      "inertia": 52292.3515625,
+      "iterations": 20,
+      "max_iter_reached": false,
+      "fit_seconds": 13.772
+    },
+    {
+      "combination": "B",
+      "n_clusters": 8,
+      "random_seed": 42,
+      "inertia": 49171.16015625,
+      "iterations": 49,
+      "max_iter_reached": false,
+      "fit_seconds": 22.812
+    },
+    {
+      "combination": "B",
+      "n_clusters": 13,
+      "random_seed": 42,
+      "inertia": 45925.71484375,
+      "iterations": 53,
+      "max_iter_reached": false,
+      "fit_seconds": 33.771
+    },
+    {
+      "combination": "B",
+      "n_clusters": 21,
+      "random_seed": 42,
+      "inertia": 43088.296875,
+      "iterations": 35,
+      "max_iter_reached": false,
+      "fit_seconds": 58.385
+    },
+    {
+      "combination": "B",
+      "n_clusters": 34,
+      "random_seed": 42,
+      "inertia": 40621.7890625,
+      "iterations": 69,
+      "max_iter_reached": false,
+      "fit_seconds": 87.741
+    },
+    {
+      "combination": "C",
+      "n_clusters": 2,
+      "random_seed": 42,
+      "inertia": 74475.125,
+      "iterations": 18,
+      "max_iter_reached": false,
+      "fit_seconds": 12.062
+    },
+    {
+      "combination": "C",
+      "n_clusters": 3,
+      "random_seed": 42,
+      "inertia": 72194.9296875,
+      "iterations": 14,
+      "max_iter_reached": false,
+      "fit_seconds": 15.286
+    },
+    {
+      "combination": "C",
+      "n_clusters": 5,
+      "random_seed": 42,
+      "inertia": 69730.5625,
+      "iterations": 43,
+      "max_iter_reached": false,
+      "fit_seconds": 30.81
+    },
+    {
+      "combination": "C",
+      "n_clusters": 8,
+      "random_seed": 42,
+      "inertia": 67303.7734375,
+      "iterations": 35,
+      "max_iter_reached": false,
+      "fit_seconds": 43.66
+    },
+    {
+      "combination": "C",
+      "n_clusters": 13,
+      "random_seed": 42,
+      "inertia": 64390.62890625,
+      "iterations": 66,
+      "max_iter_reached": false,
+      "fit_seconds": 64.87
+    },
+    {
+      "combination": "C",
+      "n_clusters": 21,
+      "random_seed": 42,
+      "inertia": 61849.46875,
+      "iterations": 50,
+      "max_iter_reached": false,
+      "fit_seconds": 119.642
+    },
+    {
+      "combination": "C",
+      "n_clusters": 34,
+      "random_seed": 42,
+      "inertia": 59747.5390625,
+      "iterations": 76,
+      "max_iter_reached": false,
+      "fit_seconds": 156.416
+    },
+    {
+      "combination": "D",
+      "n_clusters": 2,
+      "random_seed": 42,
+      "inertia": 67145.8359375,
+      "iterations": 10,
+      "max_iter_reached": false,
+      "fit_seconds": 13.192
+    },
+    {
+      "combination": "D",
+      "n_clusters": 3,
+      "random_seed": 42,
+      "inertia": 65083.015625,
+      "iterations": 15,
+      "max_iter_reached": false,
+      "fit_seconds": 15.716
+    },
+    {
+      "combination": "D",
+      "n_clusters": 5,
+      "random_seed": 42,
+      "inertia": 62751.375,
+      "iterations": 33,
+      "max_iter_reached": false,
+      "fit_seconds": 32.208
+    },
+    {
+      "combination": "D",
+      "n_clusters": 8,
+      "random_seed": 42,
+      "inertia": 60588.9609375,
+      "iterations": 33,
+      "max_iter_reached": false,
+      "fit_seconds": 37.221
+    },
+    {
+      "combination": "D",
+      "n_clusters": 13,
+      "random_seed": 42,
+      "inertia": 58062.21875,
+      "iterations": 35,
+      "max_iter_reached": false,
+      "fit_seconds": 62.261
+    },
+    {
+      "combination": "D",
+      "n_clusters": 21,
+      "random_seed": 42,
+      "inertia": 55833.82421875,
+      "iterations": 47,
+      "max_iter_reached": false,
+      "fit_seconds": 99.583
+    },
+    {
+      "combination": "D",
+      "n_clusters": 34,
+      "random_seed": 42,
+      "inertia": 53846.87890625,
+      "iterations": 55,
+      "max_iter_reached": false,
+      "fit_seconds": 153.076
+    }
+  ]
+}
