@@ -1,0 +1,46 @@
+{
+  "status": "passed",
+  "stage": "embeddings_only",
+  "games": 117344,
+  "source_cleaned_sha256": "ab8ebf9a45103693be7a9fb88b15bed6f2b4c57334bcc9d01ded868e48414e13",
+  "source_descriptors_sha256": "aa0f9c6a79a295b9f624cd77fe740f066ad3da74b5c3552075028e0d46e42c26",
+  "matrices": [
+    {
+      "combination": "A",
+      "rows": 117344,
+      "feature_columns": 509,
+      "total_columns": 511,
+      "source_feature_sha256": "26ec6f00cc9c16866cd3f7bd9cf929514ac97f6eb848d03f5fd0b045cc6cbf2b",
+      "csv_sha256": "cd74c511f95b3a00e84a4265e3c5c53fafe1e8c6d9e8ff8e5bafa2ccfa25a236",
+      "every_coordinate_matches_float32_source": true
+    },
+    {
+      "combination": "B",
+      "rows": 117344,
+      "feature_columns": 510,
+      "total_columns": 512,
+      "source_feature_sha256": "26d8c5b2c7157082fa6e319286d9a52d589eadb6671f4ed5d8d7bc22ecd9859d",
+      "csv_sha256": "4731cbf180f9973fae1a9ab5f0849d3eff013bab0852673e6171fc8785f8d7b2",
+      "every_coordinate_matches_float32_source": true
+    },
+    {
+      "combination": "C",
+      "rows": 117344,
+      "feature_columns": 893,
+      "total_columns": 895,
+      "source_feature_sha256": "2b65979a4b5f3dbadfb6639400773cf010cc22799277f84bc9da4ddead1b40ac",
+      "csv_sha256": "6db4b6bf69ee1602ddbf175ccf92298e9d53c6d2621daca3150d5ee9dc8f4e85",
+      "every_coordinate_matches_float32_source": true
+    },
+    {
+      "combination": "D",
+      "rows": 117344,
+      "feature_columns": 894,
+      "total_columns": 896,
+      "source_feature_sha256": "d6f980ebd9801e48a9b50e36c956daf8adb4d032ded1791649f9e49133fefc5a",
+      "csv_sha256": "2d66a8e112f66bce131766d805fdfcdac86031666ad32d0566bb4b83878a8fa7",
+      "every_coordinate_matches_float32_source": true
+    }
+  ],
+  "models_trained": 0
+}
