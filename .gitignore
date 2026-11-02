@@ -8,8 +8,7 @@ __pycache__
 /Papers/
 
 # Local datasets and generated files; keep Data Prep notebooks tracked
-/Data Prep/*.csv
-/Data Prep/*.xlsx
+
 /Data Prep/Translation Needed/
 /Data Prep/Translation Done/
 /Data Prep/.ipynb_checkpoints/
