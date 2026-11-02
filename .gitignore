@@ -13,3 +13,9 @@ __pycache__
 /Data Prep/Translation Done/
 /Data Prep/.ipynb_checkpoints/
 !/Data Prep/games_cleaned.csv
+.venv-clustering/
+/games.csv
+/games_cleaned.csv
+/games_descriptors.csv
+/professor_update/
+~$*
