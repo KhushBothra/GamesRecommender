@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+pydantic
+groq
+python-dotenv
+qdrant-client
