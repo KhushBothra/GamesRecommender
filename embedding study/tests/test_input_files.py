@@ -1,3 +1,7 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from read_data import load_inputs
 import json
 from pathlib import Path
 import tempfile
@@ -7,8 +11,8 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 
-from clustering.create_embeddings import export_or_reuse, load_official_inputs, main
-from clustering.pipeline import file_sha256
+from make_embeddings import export_or_reuse, load_official_inputs, main
+from file_helpers import file_sha256
 
 
 class OfficialInputTests(unittest.TestCase):
@@ -56,7 +60,7 @@ class OfficialInputTests(unittest.TestCase):
 
     def test_prepare_only_writes_nothing_and_does_not_encode(self):
         before = [p.read_bytes() for p in (self.cleaned, self.descriptors)]
-        with patch("clustering.create_embeddings.prepare_descriptions", side_effect=AssertionError("Must not encode")):
+        with patch("make_embeddings.prepare_descriptions", side_effect=AssertionError("Must not encode")):
             main(["--cleaned", str(self.cleaned), "--descriptors", str(self.descriptors),
                   "--output-dir", str(self.root/"outputs"), "--prepare-only"])
         self.assertFalse((self.root/"outputs").exists())
@@ -84,7 +88,7 @@ class CSVReuseTests(unittest.TestCase):
 
     def test_verified_csv_is_reused_without_rewriting(self):
         before = self.path.stat().st_mtime_ns
-        with patch("clustering.create_embeddings.export_one", side_effect=AssertionError("Must not export")):
+        with patch("make_embeddings.export_one", side_effect=AssertionError("Must not export")):
             record = export_or_reuse(self.root, "A", self.frame, self.features)
         self.assertEqual(record, self.record)
         self.assertEqual(before, self.path.stat().st_mtime_ns)
