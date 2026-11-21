@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { safeImageUrl } from './api';
+import { formatPrice } from './formatPrice';
 import type { GameRecommendation } from './types';
 import { MAX_MESSAGE_LENGTH, messageLength, useConversation } from './useConversation';
 import { useHealth } from './useHealth';
@@ -14,7 +15,7 @@ function GameCard({ game }: { game: GameRecommendation }) {
       <div className={`game-card-layout${showImage ? ' has-artwork' : ''}`}>
         {showImage && <img className="game-artwork" src={image!} alt={`${game.name} artwork`} loading="lazy" referrerPolicy="no-referrer" onError={() => setImageFailed(true)} />}
         <div className="game-body">
-          <div className="game-heading"><h3>{game.name}</h3><span className="game-price">{game.price ?? 'Price unavailable'}</span></div>
+          <div className="game-heading"><h3>{game.name}</h3><span className="game-price">{formatPrice(game.price)}</span></div>
           {game.description && <div className="game-explanation"><span className="explanation-label">Why it fits</span><p className="game-description">{game.description}</p></div>}
           <div className="game-bottom">
             <span className="game-developer">{game.developers.join(', ') || 'Developer unavailable'}</span>

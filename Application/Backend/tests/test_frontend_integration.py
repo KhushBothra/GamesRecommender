@@ -5,6 +5,7 @@ import sys
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
+from urllib.error import URLError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
@@ -74,6 +75,39 @@ class ArtworkTests(unittest.TestCase):
         for appid in [0, -1, True, "620"]:
             self.assertIsNone(client.lookup(appid))
         fetcher.assert_not_called()
+
+    def test_store_certificate_failure_falls_back_to_a_verified_cdn_image(self):
+        response = Mock()
+        response.__enter__ = Mock(return_value=response)
+        response.__exit__ = Mock(return_value=None)
+        response.status = 200
+        response.headers = {"Content-Type": "image/jpeg"}
+        with patch("Backend.infra.steam_artwork.urlopen", side_effect=[URLError("certificate verification failed"), response]) as fetch:
+            self.assertEqual(_fetch_image(620), "https://cdn.akamai.steamstatic.com/steam/apps/620/header.jpg")
+        request = fetch.call_args.args[0]
+        self.assertEqual(request.get_method(), "HEAD")
+        self.assertEqual(fetch.call_args.kwargs["timeout"], 3)
+        # No unverified SSL context is installed or passed to either request.
+        self.assertNotIn("context", fetch.call_args.kwargs)
+
+    def test_cdn_html_block_page_is_not_returned_as_an_image(self):
+        response = Mock()
+        response.__enter__ = Mock(return_value=response)
+        response.__exit__ = Mock(return_value=None)
+        response.status = 200
+        response.headers = {"Content-Type": "text/html"}
+        with patch("Backend.infra.steam_artwork._fetch_store_image", return_value=None), patch("Backend.infra.steam_artwork.urlopen", return_value=response):
+            self.assertIsNone(_fetch_image(620))
+
+    def test_both_image_sources_failing_keeps_text_only_cards(self):
+        with patch("Backend.infra.steam_artwork.urlopen", side_effect=URLError("Unavailable")):
+            self.assertIsNone(_fetch_image(620))
+
+    def test_valid_store_image_does_not_trigger_a_second_lookup(self):
+        image = "https://shared.fastly.steamstatic.com/620/header.jpg"
+        with patch("Backend.infra.steam_artwork._fetch_store_image", return_value=image), patch("Backend.infra.steam_artwork._fetch_cdn_image") as fallback:
+            self.assertEqual(_fetch_image(620), image)
+        fallback.assert_not_called()
 
 
 class ApiContractTests(unittest.TestCase):

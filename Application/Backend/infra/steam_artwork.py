@@ -20,7 +20,7 @@ MAX_CACHE_ENTRIES = 4096
 _executor = ThreadPoolExecutor(max_workers=5, thread_name_prefix="steam-artwork")
 
 
-def _fetch_image(appid: int) -> str | None:
+def _fetch_store_image(appid: int) -> str | None:
     query = urlencode({"appids": appid, "filters": "basic", "l": "english"})
     request = Request(
         f"https://store.steampowered.com/api/appdetails?{query}",
@@ -43,6 +43,31 @@ def _fetch_image(appid: int) -> str | None:
     ):
         return None
     return image
+
+
+def _fetch_cdn_image(appid: int) -> str | None:
+    """Verify Steam's legacy header asset when Store metadata is unavailable."""
+    image = f"https://cdn.akamai.steamstatic.com/steam/apps/{appid}/header.jpg"
+    request = Request(image, method="HEAD", headers={"User-Agent": "GamesRecommender/1.0"})
+    with urlopen(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
+        content_type = response.headers.get("Content-Type", "")
+        if response.status == 200 and isinstance(content_type, str) and content_type.lower().startswith("image/"):
+            return image
+    return None
+
+
+def _fetch_image(appid: int) -> str | None:
+    try:
+        image = _fetch_store_image(appid)
+        if image:
+            return image
+    except (OSError, ValueError) as exc:
+        logger.info("Steam Store artwork lookup failed for AppID %s: %s", appid, exc)
+    try:
+        return _fetch_cdn_image(appid)
+    except (OSError, ValueError) as exc:
+        logger.info("Steam CDN artwork unavailable for AppID %s: %s", appid, exc)
+        return None
 
 
 class SteamArtwork:
