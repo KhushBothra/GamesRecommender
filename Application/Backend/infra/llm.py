@@ -31,17 +31,37 @@ def chat(
     if max_tokens < 1:
         raise ValueError("max_tokens must be positive")
 
-    use_groq = settings.use_groq
-    groq_error = "Groq disabled by USE_GROQ."
-    if use_groq:
-        try:
-            connector = GroqConnector()
-            answer = connector.chat(messages, temperature=temperature, max_tokens=max_tokens)
-            logger.info("LLM response generated with Groq (%s)", connector.model)
-            return answer
-        except Exception as exc:
-            groq_error = str(exc)
-            logger.warning("Groq request failed; trying local Ollama. Reason: %s", groq_error)
+    groq_errors: list[str] = []
+    if settings.use_groq and settings.groq_api_keys:
+        for key_number, api_key in enumerate(settings.groq_api_keys, start=1):
+            try:
+                connector = GroqConnector(api_key=api_key)
+                answer = connector.chat(
+                    messages, temperature=temperature, max_tokens=max_tokens
+                )
+                logger.info(
+                    "LLM response generated with Groq (%s; key %d of %d)",
+                    connector.model,
+                    key_number,
+                    len(settings.groq_api_keys),
+                )
+                return answer
+            except Exception as exc:
+                groq_errors.append(f"key {key_number}: {exc}")
+                logger.warning(
+                    "Groq key %d of %d failed; trying the next configured key. Reason: %s",
+                    key_number,
+                    len(settings.groq_api_keys),
+                    exc,
+                )
+
+    if not settings.use_groq:
+        groq_error = "Groq disabled by USE_GROQ."
+    elif not settings.groq_api_keys:
+        groq_error = "No GROQ_API_KEY or numbered GROQ_API_KEY<n> values are configured."
+    else:
+        groq_error = "; ".join(groq_errors)
+        logger.warning("All configured Groq keys failed; trying local Ollama.")
 
     try:
         connector = OllamaConnector()

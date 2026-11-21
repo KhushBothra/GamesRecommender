@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -19,10 +20,33 @@ def _env_bool(name: str, default: bool) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _groq_api_keys() -> tuple[str, ...]:
+    """Read numbered Groq keys in order, then the legacy unnumbered key."""
+    numbered: list[tuple[int, str]] = []
+    for name, value in os.environ.items():
+        match = re.fullmatch(r"GROQ_API_KEY(\d+)", name)
+        if match and value.strip():
+            numbered.append((int(match.group(1)), value.strip()))
+
+    ordered = [value for _, value in sorted(numbered)]
+    legacy = os.getenv("GROQ_API_KEY", "").strip()
+    if legacy:
+        ordered.append(legacy)
+
+    # Avoid retrying the same credential if it was copied under multiple names.
+    unique: list[str] = []
+    seen: set[str] = set()
+    for value in ordered:
+        if value not in seen:
+            unique.append(value)
+            seen.add(value)
+    return tuple(unique)
+
+
 @dataclass(frozen=True)
 class Settings:
     use_groq: bool
-    groq_api_key: str | None
+    groq_api_keys: tuple[str, ...]
     groq_model: str
     ollama_base_url: str
     ollama_chat_url: str
@@ -41,7 +65,7 @@ def get_settings() -> Settings:
     base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
     return Settings(
         use_groq=_env_bool("USE_GROQ", True),
-        groq_api_key=os.getenv("GROQ_API_KEY", "").strip() or None,
+        groq_api_keys=_groq_api_keys(),
         groq_model=os.getenv("GROQ_MODEL", "openai/gpt-oss-20b").strip(),
         ollama_base_url=base_url,
         ollama_chat_url=os.getenv("OLLAMA_CHAT_URL", f"{base_url}/api/chat").strip(),

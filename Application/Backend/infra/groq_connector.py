@@ -4,10 +4,10 @@ from Backend.infra.config import settings
 
 
 class GroqConnector:
-    def __init__(self) -> None:
-        api_key = settings.groq_api_key
+    def __init__(self, api_key: str | None = None) -> None:
+        api_key = api_key or (settings.groq_api_keys[0] if settings.groq_api_keys else None)
         if not api_key:
-            raise RuntimeError("GROQ_API_KEY is not set.")
+            raise RuntimeError("No GROQ_API_KEY or GROQ_API_KEY<n> value is set.")
         try:
             from groq import Groq
         except ImportError as exc:

@@ -33,7 +33,7 @@ if (-not (Test-Path ".\Application\Backend\.env")) {
 notepad ".\Application\Backend\.env"
 ```
 
-Enter your real `GROQ_API_KEY`, keeping `USE_GROQ=true` and `GROQ_MODEL=openai/gpt-oss-20b`. Keep the default local Qdrant settings: host `localhost`, port `6333`, collection `game_embeddings`, and an empty `QDRANT_API_KEY`. Save the file as `.env`, not `.env.txt`. Keep secrets in this backend file and out of frontend variables and Git. Restart the backend after changing its environment.
+Set one or more Groq credentials as `GROQ_API_KEY1`, `GROQ_API_KEY2`, and so on, keeping `USE_GROQ=true` and `GROQ_MODEL=openai/gpt-oss-20b`. The backend tries numbered keys in order and uses Ollama only after all configured keys fail. The legacy unnumbered `GROQ_API_KEY` is still accepted after numbered keys. Keep the default local Qdrant settings: host `localhost`, port `6333`, collection `game_embeddings`, and an empty `QDRANT_API_KEY`. Save the file as `.env`, not `.env.txt`. Keep secrets in this backend file and out of frontend variables and Git. Restart the backend after changing its environment.
 
 ### 3. Populate Qdrant once on this computer
 
@@ -162,7 +162,7 @@ uv sync --project Application/Backend --python 3.12
 uv run --project Application/Backend --python 3.12 uvicorn Backend.main:app --app-dir Application --host 127.0.0.1 --port 8000 --reload --reload-dir Application/Backend
 ```
 
-Before searching, configure `Application/Backend/.env` from its example if it does not exist. The default provider is Groq and requires `GROQ_API_KEY`. Alternatively configure Ollama with `USE_GROQ=false` and a running local model. Qdrant must be running with the expected `game_embeddings` collection populated by the project's existing ingestion workflow. Backend secrets belong only in the backend environment.
+Before searching, configure `Application/Backend/.env` from its example if it does not exist. The default provider is Groq and accepts numbered `GROQ_API_KEY1`, `GROQ_API_KEY2`, etc. Alternatively configure Ollama with `USE_GROQ=false` and a running local model. Qdrant must be running with the expected `game_embeddings` collection populated by the project's existing ingestion workflow. Backend secrets belong only in the backend environment.
 
 Ollama requests set `OLLAMA_NUM_GPU=999` by default to request all model layers on the GPU. Ollama may still partially offload when the model and context do not fit the available VRAM. Check `ollama ps` during a fallback call to see the actual CPU/GPU split reported by Ollama.
 
