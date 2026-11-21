@@ -1,0 +1,8 @@
+[project]
+name = "games-recommender-api"
+version = "1.0.0"
+requires-python = ">=3.12"
+dependencies = ["fastapi", "uvicorn[standard]", "pydantic", "groq", "python-dotenv", "qdrant-client"]
+
+[dependency-groups]
+dev = ["httpx"]
