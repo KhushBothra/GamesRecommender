@@ -185,11 +185,11 @@ See `Frontend/README.md` for frontend configuration, recovery behavior, and test
 ## Backend changes included with the frontend
 
 - The recommendation shape has an additional optional nullable `image_url` field. Existing clients can continue using the other fields.
-- Completed recommendations receive a best-effort Steam `header_image` lookup. Five workers limit concurrent lookups; each HTTP operation has a three-second timeout. Successes are cached for 24 hours and failures for ten minutes, with a bounded in-memory cache. A missing image never fails the recommendation.
+- Completed recommendations receive a best-effort Steam `header_image` lookup. If Store metadata is unavailable, the backend checks the official Akamai Steam CDN's AppID-based header image with an HTTPS HEAD request and accepts it only when it returns an image content type. Five workers limit concurrent lookups; each HTTP operation has a three-second timeout. Successes are cached for 24 hours and failures for ten minutes, with a bounded in-memory cache. A missing image never fails the recommendation.
 - Artwork fetching does not replace dataset prices, generated explanations, or ranking. Prices are not represented as current Steam prices.
 - The default descriptor dataset path now points to repository-level `Data Prep/`.
 
-Steam's Store endpoint is undocumented and may fail or be rate-limited. HTTPS verification stays enabled. Missing artwork, including certificate/network failures, produces a text-only card.
+Steam's Store endpoint and legacy CDN asset paths may be unavailable for some games. HTTPS verification stays enabled for both sources. If both fail, the frontend keeps a text-only card. Restart the backend after changing artwork code to clear any ten-minute cached lookup failures, then start a new search to populate image URLs on the results.
 
 ## Backend tests
 

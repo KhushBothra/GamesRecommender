@@ -39,7 +39,7 @@ The UI announces waiting status after submission and additional reassurance afte
 
 ## Game cards
 
-Cards display the backend's name, developer list, price text, and generated explanation under Why it fits. Details expands publishers and AppID. Missing prices display Price unavailable; a string such as `0.0` is not assumed to mean free or assigned a currency. No match scores or live price claims are invented.
+Cards display the backend's name, developer list, price, and generated explanation under Why it fits. Details expands publishers and AppID. Numeric price strings display as US dollars, for example `4.99` becomes `$4.99`, and zero displays Free. Missing prices display Price unavailable. Existing formatted price text is preserved. This changes presentation only; prices remain dataset values, not live Steam quotes. No match scores are invented.
 
 Optional secure `image_url` artwork is displayed as compact landscape imagery. Missing fields remain compatible with older responses. An unavailable or broken image removes its area entirely without affecting the text card. No Steam descriptions or prices are fetched by the browser.
 

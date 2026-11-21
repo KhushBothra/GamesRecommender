@@ -38,11 +38,18 @@ describe('Guided Games Recommender', () => {
     await screen.findByRole('heading', { name: 'Portal 2' });
     expect(api.calls().map((call) => call[0])).toEqual(['/api/v1/conversations', '/api/v1/conversations/session-1/turns']);
     expect(api.calls().map((call) => JSON.parse(String(call[1]?.body)))).toEqual([{ user_text: 'An exploration game.' }, { user_text: 'Single-player.' }]);
-    expect(screen.getByText('0.0')).toBeInTheDocument();
-    expect(screen.queryByText('Free')).not.toBeInTheDocument();
+    expect(screen.getByText('Free')).toBeInTheDocument();
     expect(screen.getByText('Price unavailable')).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Games for you' })).toHaveFocus();
+  });
+
+  it('displays numeric game prices in US dollars', async () => {
+    mockApi([{ ...final, recommendations: [{ ...final.recommendations[0], price: '4.99' }] }]);
+    const user = userEvent.setup();
+    render(<App />);
+    await answer(user, 'A fighting game.');
+    expect(await screen.findByText('$4.99')).toBeInTheDocument();
   });
 
   it('supports multiple follow-ups and exposes the previous question/answer history', async () => {
