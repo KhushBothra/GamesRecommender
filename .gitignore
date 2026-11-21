@@ -18,5 +18,6 @@ __pycache__
 /games_cleaned.csv
 /games_descriptors.csv
 /professor_update/
+/Application/Backend/logs/
 /.vscode/
 ~$*

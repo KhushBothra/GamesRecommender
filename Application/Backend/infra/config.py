@@ -27,6 +27,7 @@ class Settings:
     ollama_base_url: str
     ollama_chat_url: str
     ollama_model: str
+    ollama_num_gpu: int
     ollama_timeout_seconds: int
     qdrant_host: str
     qdrant_port: int
@@ -45,6 +46,8 @@ def get_settings() -> Settings:
         ollama_base_url=base_url,
         ollama_chat_url=os.getenv("OLLAMA_CHAT_URL", f"{base_url}/api/chat").strip(),
         ollama_model=os.getenv("OLLAMA_MODEL", "qwen3:4b").strip(),
+        # Request all layers on the GPU; Ollama may use partial offload if VRAM is tight.
+        ollama_num_gpu=int(os.getenv("OLLAMA_NUM_GPU", "999")),
         ollama_timeout_seconds=int(os.getenv("OLLAMA_TIMEOUT_SECONDS", "180")),
         qdrant_host=os.getenv("QDRANT_HOST", "localhost").strip(),
         qdrant_port=int(os.getenv("QDRANT_PORT", "6333")),

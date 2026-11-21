@@ -12,6 +12,7 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Literal
 
+from Backend.infra.recommendation_log import append_recommendation_run
 from Backend.infra.steam_artwork import steam_artwork
 
 from Backend.tasks.conversation.service import (
@@ -168,6 +169,14 @@ class ApplicationOrchestrator:
         # supplied separately because the conversation task returns it as data.
         with session.lock:
             transcript = [dict(message) for message in session.messages]
+            opening_user_prompt = next(
+                (
+                    message["content"]
+                    for message in session.messages
+                    if message["role"] == "user"
+                ),
+                "",
+            )
 
         try:
             retrieved = recommend_games(turn.query)
@@ -186,6 +195,15 @@ class ApplicationOrchestrator:
         except Exception:
             logger.warning("Could not enrich artwork; returning text cards", exc_info=True)
             recommendations = [{**game, "image_url": None} for game in recommendations]
+        try:
+            append_recommendation_run(
+                opening_user_prompt=opening_user_prompt,
+                query=turn.query,
+                recommended_appids=[game["appid"] for game in recommendations],
+            )
+        except Exception:
+            # Observability must not turn a completed recommendation into an API error.
+            logger.exception("Could not append the local recommendation run log")
         if recommendations:
             message = f"Here are {len(recommendations)} games that may fit your preferences."
         else:

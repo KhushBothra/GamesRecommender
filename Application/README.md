@@ -164,7 +164,11 @@ uv run --project Application/Backend --python 3.12 uvicorn Backend.main:app --ap
 
 Before searching, configure `Application/Backend/.env` from its example if it does not exist. The default provider is Groq and requires `GROQ_API_KEY`. Alternatively configure Ollama with `USE_GROQ=false` and a running local model. Qdrant must be running with the expected `game_embeddings` collection populated by the project's existing ingestion workflow. Backend secrets belong only in the backend environment.
 
+Ollama requests set `OLLAMA_NUM_GPU=999` by default to request all model layers on the GPU. Ollama may still partially offload when the model and context do not fit the available VRAM. Check `ollama ps` during a fallback call to see the actual CPU/GPU split reported by Ollama.
+
 The descriptor vocabulary defaults to the repository's `Data Prep/games_descriptors.csv`; `GAMES_DESCRIPTORS_PATH` can override it. Do not create a duplicate dataset under `Application/`.
+
+The conversation agent checks the user's player-mode preference (single-player or multiplayer) and online versus offline/local preference before finalizing the query. These are conversational checks, not hard Qdrant filters. It targets at least ten **distinct, supported** descriptors across tags, genres, and categories; repeated labels across groups count once. It can ask up to five clarification questions; if it still cannot cover both checks and ground ten descriptors, it ends the search without fabricating preferences. Each completed query and recommendation run is appended locally to `Application/Backend/logs/recommendation_runs.csv`, with the opening prompt, generated query, and ordered recommended AppIDs. This runtime log is ignored by Git.
 
 API documentation is at `http://127.0.0.1:8000/docs`. `/api/v1/health` reports API process liveness only; it does not prove Groq/Ollama or Qdrant is ready.
 

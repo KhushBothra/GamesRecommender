@@ -83,6 +83,8 @@ def parse_decision(data: Any) -> LLMDecision:
 
     if set(data) != {"class", "reason"}:
         raise ResponseSchemaError("class 4 must contain exactly class and reason")
-    if data.get("reason") != "NO_SUPPORTED_DESCRIPTORS":
-        raise ResponseSchemaError("class 4 reason must be NO_SUPPORTED_DESCRIPTORS")
-    return LLMDecision(response_class=4, reason="NO_SUPPORTED_DESCRIPTORS")
+    if data.get("reason") != "INSUFFICIENT_QUERY_CONTEXT":
+        raise ResponseSchemaError(
+            "class 4 reason must be INSUFFICIENT_QUERY_CONTEXT"
+        )
+    return LLMDecision(response_class=4, reason="INSUFFICIENT_QUERY_CONTEXT")

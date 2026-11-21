@@ -20,6 +20,7 @@ from Backend.tasks.conversation.stateful import ConversationSession, conversatio
 
 logger = logging.getLogger(__name__)
 MAX_CLARIFICATION_QUESTIONS = 5
+MIN_QUERY_DESCRIPTORS = 10
 
 
 class ConversationTaskError(RuntimeError):
@@ -39,6 +40,17 @@ class UnknownDescriptorError(ResponseSchemaError):
         self.unknown = unknown
         details = ", ".join(f"{group}: {value!r}" for group, value in unknown)
         super().__init__(f"query contains descriptors outside the allowed vocabulary: {details}")
+
+
+class InsufficientDescriptorCountError(ResponseSchemaError):
+    """Raised when a final query has fewer than ten distinct descriptors."""
+
+    def __init__(self, count: int) -> None:
+        self.count = count
+        super().__init__(
+            f"final query has {count} distinct supported descriptors; "
+            f"at least {MIN_QUERY_DESCRIPTORS} are required"
+        )
 
 
 @dataclass(frozen=True)
@@ -169,15 +181,16 @@ class ConversationService:
 
         if session.clarification_questions_asked < MAX_CLARIFICATION_QUESTIONS:
             raise ConversationProtocolError(
-                "LLM returned the no-descriptor outcome before the clarification limit"
+                "LLM returned the insufficient-descriptor outcome before the clarification limit"
             )
         self.store.remove(session.conversation_id)
         return ConversationTurn(
             conversation_id=session.conversation_id,
             status="refused",
             message=(
-                "I couldn't map your request to the available game descriptors. "
-                "Please start a new conversation with a game theme or feature."
+                "I couldn't gather enough supported preferences to build a "
+                "reliable search. Please start a new search and include your "
+                "preferred player mode, connectivity, and game themes or features."
             ),
         )
 
@@ -198,6 +211,19 @@ class ConversationService:
                 ),
                 INVALID_DESCRIPTORS="\n".join(
                     f"{group}: {value}" for group, value in exc.unknown
+                ),
+            )
+        except InsufficientDescriptorCountError as exc:
+            repair_prompt = render_prompt(
+                "repair_minimum.md",
+                PROPOSED_QUERY_JSON=json.dumps(
+                    self._try_json_for_repair(raw), ensure_ascii=False
+                ),
+                VALIDATION_ERRORS=str(exc),
+                QUESTIONS_ASKED=str(session.clarification_questions_asked),
+                QUESTIONS_REMAINING=str(
+                    MAX_CLARIFICATION_QUESTIONS
+                    - session.clarification_questions_asked
                 ),
             )
         except (ResponseSchemaError, TypeError, ValueError) as exc:
@@ -226,13 +252,21 @@ class ConversationService:
     ) -> LLMDecision:
         decision = parse_decision(payload)
         _check_descriptor_membership(decision)
+        if decision.response_class == 2 and decision.query is not None:
+            distinct = {
+                value.casefold()
+                for field in ("tags", "genres", "categories")
+                for value in getattr(decision.query, field)
+            }
+            if len(distinct) < MIN_QUERY_DESCRIPTORS:
+                raise InsufficientDescriptorCountError(len(distinct))
         if decision.response_class == 1 and session.clarification_questions_asked >= MAX_CLARIFICATION_QUESTIONS:
             raise ResponseSchemaError(
-                "five clarification questions have already been asked; return a final query or no-descriptor outcome"
+                "five clarification questions have already been asked; return a valid query or the insufficient-descriptor outcome"
             )
         if decision.response_class == 4 and session.clarification_questions_asked < MAX_CLARIFICATION_QUESTIONS:
             raise ResponseSchemaError(
-                "the no-descriptor outcome is allowed only after five questions have been asked"
+                "the insufficient-descriptor outcome is allowed only after five questions have been asked"
             )
         return decision
 
@@ -249,7 +283,8 @@ class ConversationService:
         if session.clarification_questions_asked >= MAX_CLARIFICATION_QUESTIONS:
             errors.append(
                 "The five-question limit has been reached. Do not ask another question; "
-                "return Class 2 if any supported descriptor maps, otherwise Class 4."
+                "return Class 2 only if both required preference checks are covered and at "
+                "least ten distinct supported descriptors map; otherwise return Class 4."
             )
         return "\n".join(errors)
 

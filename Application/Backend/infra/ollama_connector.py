@@ -36,7 +36,11 @@ class OllamaConnector:
             "model": self.chat_model,
             "messages": messages,
             "stream": False,
-            "options": {"temperature": temperature, "num_predict": max_tokens},
+            "options": {
+                "temperature": temperature,
+                "num_predict": max_tokens,
+                "num_gpu": settings.ollama_num_gpu,
+            },
         }
         if self.chat_model.casefold().startswith("qwen3"):
             # Qwen3's default thinking mode can spend a bounded response budget
