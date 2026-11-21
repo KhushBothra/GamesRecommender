@@ -1,8 +1,12 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from read_data import load_inputs
 """Small, synthetic checks for the shared feature-preparation pipeline.
 
 These tests need no Steam CSVs, model download, or trained clustering models.
 Run from the project root with:
-    python -m unittest discover -s clustering/tests -v
+    python -m unittest discover -s "embedding study/tests" -v
 """
 
 from pathlib import Path
@@ -12,11 +16,10 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from clustering.pipeline import (
+from feature_vectors import (
     COMBINATIONS,
     combine_features,
     encode_popularity,
-    load_inputs,
     normalize_rows,
 )
 
