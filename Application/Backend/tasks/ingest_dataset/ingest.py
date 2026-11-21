@@ -4,9 +4,10 @@ Each Qdrant payload includes the display fields plus a ``descriptors`` list of
 all active descriptor names. The numeric descriptor weights remain in the
 vector and are not duplicated in the payload.
 
-Run from the project root with:
+Run from Application/ with:
 
-    python -m Backend.tasks.ingest_dataset.ingest
+    uv run --project Backend --python 3.12 python -m Backend.tasks.ingest_dataset.ingest --validate-only
+    uv run --project Backend --python 3.12 python -m Backend.tasks.ingest_dataset.ingest --create-collection
 
 The data paths are resolved relative to the repository root by locating its
 ``Data Prep`` directory. This works both in the current local Backend folder
@@ -15,6 +16,7 @@ and after moving this package under ``Application/Backend``.
 
 from __future__ import annotations
 
+import argparse
 import csv
 import math
 from pathlib import Path
@@ -66,6 +68,8 @@ def _read_headers(path: Path) -> list[str]:
         headers = next(csv.reader(stream), None)
     if not headers:
         raise ValueError(f"CSV is empty: {path}")
+    if len(set(headers)) != len(headers):
+        raise ValueError(f"CSV contains duplicate column names: {path.name}")
     return headers
 
 
@@ -163,24 +167,47 @@ def _validate_matching_ids(
     return len(seen)
 
 
-def _validate_collection(client: Any, collection_name: str, dimensions: int) -> None:
+def _validate_collection(
+    client: Any,
+    collection_name: str,
+    dimensions: int,
+    *,
+    create_collection: bool = False,
+) -> None:
     if not client.collection_exists(collection_name):
-        raise QdrantConnectorError(
-            f"Qdrant collection {collection_name!r} does not exist. Create it first."
+        if not create_collection:
+            raise QdrantConnectorError(
+                f"Qdrant collection {collection_name!r} does not exist. "
+                "Run ingestion with --create-collection to create it."
+            )
+        from qdrant_client import models
+
+        client.create_collection(
+            collection_name=collection_name,
+            vectors_config=models.VectorParams(size=dimensions, distance=models.Distance.COSINE),
         )
+        print(f"Created {collection_name!r}: {dimensions} dimensions, Cosine distance.")
     info = client.get_collection(collection_name)
     vector_config = info.config.params.vectors
     if isinstance(vector_config, dict):
-        if len(vector_config) != 1:
-            raise QdrantConnectorError(
-                "Expected one unnamed dense vector in the collection."
-            )
-        vector_config = next(iter(vector_config.values()))
+        raise QdrantConnectorError(
+            "Expected one unnamed dense vector; named vector collections are not supported. "
+            "The existing collection was not changed."
+        )
     configured_size = getattr(vector_config, "size", None)
     if configured_size != dimensions:
         raise QdrantConnectorError(
             f"Collection vector size is {configured_size}; dataset has {dimensions} descriptors."
         )
+    distance = getattr(vector_config, "distance", None)
+    distance_name = getattr(distance, "value", distance)
+    if not isinstance(distance_name, str) or distance_name.casefold() != "cosine":
+        raise QdrantConnectorError(
+            f"Collection distance is {distance_name!r}; expected Cosine. "
+            "The existing collection was not changed."
+        )
+    if getattr(vector_config, "multivector_config", None) is not None:
+        raise QdrantConnectorError("Expected a single dense vector, not a multivector collection.")
 
 
 def ingest_dataset(
@@ -188,10 +215,14 @@ def ingest_dataset(
     descriptors_path: Path = DESCRIPTORS_CSV,
     *,
     batch_size: int = BATCH_SIZE,
+    validate_only: bool = False,
+    create_collection: bool = False,
 ) -> int:
     """Validate, join by AppID, and batch-upsert all games into Qdrant."""
     if batch_size < 1:
         raise ValueError("batch_size must be positive")
+    if validate_only and create_collection:
+        raise ValueError("validate_only and create_collection cannot be combined")
 
     payloads = _load_game_payloads(games_path)
     descriptor_headers = _descriptor_headers(descriptors_path)
@@ -204,10 +235,14 @@ def ingest_dataset(
     )
     print(f"Preflight passed: {descriptor_count:,} matching games, no duplicate IDs.")
 
+    if validate_only:
+        print("Validation only: no Qdrant connection, collection creation, or uploads performed.")
+        return descriptor_count
+
     check_qdrant_connection()
     client = get_qdrant_client()
     collection_name = settings.qdrant_collection_name
-    _validate_collection(client, collection_name, dimensions)
+    _validate_collection(client, collection_name, dimensions, create_collection=create_collection)
     print(f"Connected. Upserting into {collection_name!r} in batches of {batch_size}.")
 
     try:
@@ -253,6 +288,28 @@ def ingest_dataset(
     return uploaded
 
 
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Validate and ingest the weighted Steam game catalogue into Qdrant.")
+    action = parser.add_mutually_exclusive_group()
+    action.add_argument("--validate-only", action="store_true", help="Validate CSVs without contacting or modifying Qdrant.")
+    action.add_argument("--create-collection", action="store_true", help="Create a missing unnamed Cosine collection before upload. Never replaces an existing collection.")
+    parser.add_argument("--games-path", type=Path, default=GAMES_CSV, help="Path to games_cleaned.csv.")
+    parser.add_argument("--descriptors-path", type=Path, default=DESCRIPTORS_CSV, help="Path to games_descriptors.csv.")
+    parser.add_argument("--batch-size", type=int, default=BATCH_SIZE, help="Upsert batch size (default: 256).")
+    args = parser.parse_args(argv)
+    try:
+        total = ingest_dataset(
+            args.games_path,
+            args.descriptors_path,
+            batch_size=args.batch_size,
+            validate_only=args.validate_only,
+            create_collection=args.create_collection,
+        )
+    except (ValueError, OSError, QdrantConnectorError) as exc:
+        parser.exit(1, f"Ingestion failed: {exc}\n")
+    print(f"Finished: {total:,} games {'validated' if args.validate_only else 'ingested'}.")
+    return 0
+
+
 if __name__ == "__main__":
-    total = ingest_dataset()
-    print(f"Finished: {total:,} games ingested.")
+    raise SystemExit(main())

@@ -12,6 +12,8 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Literal
 
+from Backend.infra.steam_artwork import steam_artwork
+
 from Backend.tasks.conversation.service import (
     ConversationService,
     ConversationTurn,
@@ -179,6 +181,11 @@ class ApplicationOrchestrator:
             raise OrchestrationError(f"Could not generate recommendations: {exc}") from exc
 
         self.conversations.complete(turn.conversation_id)
+        try:
+            recommendations = steam_artwork.enrich(recommendations)
+        except Exception:
+            logger.warning("Could not enrich artwork; returning text cards", exc_info=True)
+            recommendations = [{**game, "image_url": None} for game in recommendations]
         if recommendations:
             message = f"Here are {len(recommendations)} games that may fit your preferences."
         else:

@@ -2,7 +2,7 @@
 
 Run from the project root with:
 
-    uvicorn Backend.main:app --reload
+    uvicorn Backend.main:app --app-dir Application --reload
 
 Conversation, retrieval, and presentation flow is delegated to orchestrator.py.
 """
@@ -37,6 +37,7 @@ class GameRecommendation(BaseModel):
     # Keep price display-ready without assuming currency or numeric formatting.
     price: str | None
     description: str
+    image_url: str | None = None
 
 
 class ConversationResponse(BaseModel):

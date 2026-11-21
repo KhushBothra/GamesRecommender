@@ -55,7 +55,7 @@ def get_settings() -> Settings:
         games_descriptors_path=Path(
             os.getenv(
                 "GAMES_DESCRIPTORS_PATH",
-                str(BACKEND_DIR.parent / "Data Prep" / "games_descriptors.csv"),
+                str(BACKEND_DIR.parents[1] / "Data Prep" / "games_descriptors.csv"),
             )
         ).expanduser(),
     )
