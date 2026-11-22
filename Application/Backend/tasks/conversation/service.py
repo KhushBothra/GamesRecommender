@@ -14,6 +14,7 @@ from Backend.tasks.conversation.prompts import load_prompt, render_prompt
 from Backend.tasks.conversation.schemas import (
     LLMDecision,
     ResponseSchemaError,
+    decision_json_schema,
     parse_decision,
 )
 from Backend.tasks.conversation.stateful import ConversationSession, conversation_store
@@ -154,7 +155,15 @@ class ConversationService:
 
     def _advance(self, session: ConversationSession) -> ConversationTurn:
         messages = session.build_llm_messages()
-        raw = chat(messages, temperature=0.2, max_tokens=700)
+        # The server owns this counter. Do not make the model infer it from
+        # transcript wording, or permit an outcome validation would reject.
+        messages.insert(1, {"role": "system", "content": self._turn_instructions(session)})
+        raw = chat(
+            messages, temperature=0.2, max_tokens=700,
+            response_schema=decision_json_schema(
+                allow_clarification=session.clarification_questions_asked < MAX_CLARIFICATION_QUESTIONS
+            ),
+        )
         decision = self._parse_validate_or_repair(raw, messages, session)
 
         if decision.response_class == 1:
@@ -239,6 +248,9 @@ class ConversationService:
                 [*messages, {"role": "user", "content": repair_prompt}],
                 temperature=0,
                 max_tokens=700,
+                response_schema=decision_json_schema(
+                    allow_clarification=session.clarification_questions_asked < MAX_CLARIFICATION_QUESTIONS
+                ),
             )
             decision = self._validate_payload(_strict_json_object(repaired_raw), session)
         except Exception as exc:
@@ -278,15 +290,30 @@ class ConversationService:
             return {"unparsed_model_output": raw}
 
     @staticmethod
-    def _format_validation_errors(exc: Exception, session: ConversationSession) -> str:
-        errors = [str(exc)]
-        if session.clarification_questions_asked >= MAX_CLARIFICATION_QUESTIONS:
-            errors.append(
-                "The five-question limit has been reached. Do not ask another question; "
-                "return Class 2 only if both required preference checks are covered and at "
-                "least ten distinct supported descriptors map; otherwise return Class 4."
+    def _turn_instructions(session: ConversationSession) -> str:
+        asked = session.clarification_questions_asked
+        remaining = max(0, MAX_CLARIFICATION_QUESTIONS - asked)
+        state = (
+            "Authoritative backend state for this turn (not user preferences):\n"
+            f"Clarification questions already asked: {asked}\n"
+            f"Clarification questions remaining: {remaining}\n"
+        )
+        if remaining:
+            return state + (
+                "Return Class 2 if both required preference checks are covered and "
+                "at least ten distinct supported descriptors are grounded; otherwise "
+                "return Class 1 with one useful clarification question. Class 4 is "
+                "not allowed on this turn. The question limit is a ceiling, not a target."
             )
-        return "\n".join(errors)
+        return state + (
+            "The five-question limit has been reached. Do not ask another question; "
+            "return Class 2 only if both required preference checks are covered and at "
+            "least ten distinct supported descriptors map; otherwise return Class 4."
+        )
+
+    @staticmethod
+    def _format_validation_errors(exc: Exception, session: ConversationSession) -> str:
+        return f"{exc}\n{ConversationService._turn_instructions(session)}"
 
 
 conversation_service = ConversationService()

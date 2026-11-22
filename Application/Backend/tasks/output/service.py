@@ -8,7 +8,9 @@ from typing import Any
 
 from Backend.infra.llm import chat
 from Backend.tasks.output.prompts import load_prompt, render_prompt
-from Backend.tasks.output.schemas import GameExplanation, OutputSchemaError, parse_output
+from Backend.tasks.output.schemas import (
+    OUTPUT_JSON_SCHEMA, GameExplanation, OutputSchemaError, parse_output,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -129,6 +131,7 @@ def _parse_or_repair(
                 MAX_OUTPUT_TOKENS,
                 BASE_OUTPUT_TOKENS + len(expected_appids) * MAX_EXPLANATION_TOKENS_PER_GAME,
             ),
+            response_schema=OUTPUT_JSON_SCHEMA,
         )
         return parse_output(_strict_json_object(repaired), expected_appids)
     except Exception as exc:
@@ -167,7 +170,10 @@ class OutputService:
             MAX_OUTPUT_TOKENS,
             BASE_OUTPUT_TOKENS + len(games) * MAX_EXPLANATION_TOKENS_PER_GAME,
         )
-        raw = chat(messages, temperature=0, max_tokens=max_tokens)
+        raw = chat(
+            messages, temperature=0, max_tokens=max_tokens,
+            response_schema=OUTPUT_JSON_SCHEMA,
+        )
         explanations = _parse_or_repair(
             raw,
             messages=messages,

@@ -2,8 +2,61 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any
+
+DECISION_JSON_SCHEMA: dict[str, Any] = {
+    "anyOf": [
+        {
+            "type": "object",
+            "properties": {
+                "class": {"type": "integer", "enum": [1]},
+                "question": {"type": "string"},
+            },
+            "required": ["class", "question"],
+            "additionalProperties": False,
+        },
+        {
+            "type": "object",
+            "properties": {
+                "class": {"type": "integer", "enum": [2]},
+                "query": {
+                    "type": "object",
+                    "properties": {
+                        group: {"type": "array", "items": {"type": "string"}}
+                        for group in ("tags", "genres", "categories")
+                    },
+                    "required": ["tags", "genres", "categories"],
+                    "additionalProperties": False,
+                },
+            },
+            "required": ["class", "query"],
+            "additionalProperties": False,
+        },
+        {
+            "type": "object",
+            "properties": {
+                "class": {"type": "integer", "enum": [4]},
+                "reason": {"type": "string", "enum": ["INSUFFICIENT_QUERY_CONTEXT"]},
+            },
+            "required": ["class", "reason"],
+            "additionalProperties": False,
+        },
+    ]
+}
+
+
+def decision_json_schema(*, allow_clarification: bool) -> dict[str, Any]:
+    """Constrain generation to outcomes legal at this conversation turn."""
+    allowed_classes = {1, 2} if allow_clarification else {2, 4}
+    return {
+        "anyOf": [
+            deepcopy(branch)
+            for branch in DECISION_JSON_SCHEMA["anyOf"]
+            if branch["properties"]["class"]["enum"][0] in allowed_classes
+        ]
+    }
 
 
 class ResponseSchemaError(ValueError):

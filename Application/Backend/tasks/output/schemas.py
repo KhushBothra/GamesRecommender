@@ -5,6 +5,26 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+OUTPUT_JSON_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "games": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "appid": {"type": "integer"},
+                    "explanation": {"type": ["string", "null"]},
+                },
+                "required": ["appid", "explanation"],
+                "additionalProperties": False,
+            },
+        }
+    },
+    "required": ["games"],
+    "additionalProperties": False,
+}
+
 
 class OutputSchemaError(ValueError):
     """Raised when generated output does not match the required JSON contract."""
