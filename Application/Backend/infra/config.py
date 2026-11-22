@@ -13,13 +13,6 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(BACKEND_DIR / ".env")
 
 
-def _env_bool(name: str, default: bool) -> bool:
-    value = os.getenv(name)
-    if value is None:
-        return default
-    return value.strip().lower() in {"1", "true", "yes", "on"}
-
-
 def _groq_api_keys() -> tuple[str, ...]:
     """Read numbered Groq keys in order, then the legacy unnumbered key."""
     numbered: list[tuple[int, str]] = []
@@ -45,14 +38,8 @@ def _groq_api_keys() -> tuple[str, ...]:
 
 @dataclass(frozen=True)
 class Settings:
-    use_groq: bool
     groq_api_keys: tuple[str, ...]
     groq_model: str
-    ollama_base_url: str
-    ollama_chat_url: str
-    ollama_model: str
-    ollama_num_gpu: int
-    ollama_timeout_seconds: int
     qdrant_host: str
     qdrant_port: int
     qdrant_collection_name: str
@@ -62,17 +49,9 @@ class Settings:
 
 def get_settings() -> Settings:
     """Read settings from environment variables, with local-dev defaults."""
-    base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
     return Settings(
-        use_groq=_env_bool("USE_GROQ", True),
         groq_api_keys=_groq_api_keys(),
         groq_model=os.getenv("GROQ_MODEL", "openai/gpt-oss-20b").strip(),
-        ollama_base_url=base_url,
-        ollama_chat_url=os.getenv("OLLAMA_CHAT_URL", f"{base_url}/api/chat").strip(),
-        ollama_model=os.getenv("OLLAMA_MODEL", "qwen3:4b").strip(),
-        # Request all layers on the GPU; Ollama may use partial offload if VRAM is tight.
-        ollama_num_gpu=int(os.getenv("OLLAMA_NUM_GPU", "999")),
-        ollama_timeout_seconds=int(os.getenv("OLLAMA_TIMEOUT_SECONDS", "180")),
         qdrant_host=os.getenv("QDRANT_HOST", "localhost").strip(),
         qdrant_port=int(os.getenv("QDRANT_PORT", "6333")),
         qdrant_collection_name=os.getenv(

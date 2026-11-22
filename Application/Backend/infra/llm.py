@@ -6,13 +6,12 @@ from typing import Any
 
 from Backend.infra.config import settings
 from Backend.infra.groq_connector import GroqConnector
-from Backend.infra.ollama_connector import OllamaConnector
 
 logger = logging.getLogger(__name__)
 
 
 class LLMError(RuntimeError):
-    """Raised when the selected LLM provider and fallback both fail."""
+    """Raised when Groq is unconfigured or all configured keys fail."""
 
 
 def chat(
@@ -20,10 +19,12 @@ def chat(
     *,
     temperature: float = 0.2,
     max_tokens: int = 500,
+    response_schema: dict[str, Any] | None = None,
 ) -> str:
-    """Use Groq when enabled, with local Ollama as the fallback.
+    """Use Groq, trying each configured API key in order.
 
-    The caller supplies the system prompt and conversation history. This module
+    The caller supplies the system prompt, conversation history, and optional
+    response schema. This module
     does not own conversation state or decide when to ask follow-up questions.
     """
     if not messages:
@@ -31,47 +32,38 @@ def chat(
     if max_tokens < 1:
         raise ValueError("max_tokens must be positive")
 
+    if not settings.groq_api_keys:
+        raise LLMError("No GROQ_API_KEY or numbered GROQ_API_KEY<n> values are configured.")
+
     groq_errors: list[str] = []
-    if settings.use_groq and settings.groq_api_keys:
-        for key_number, api_key in enumerate(settings.groq_api_keys, start=1):
-            try:
-                connector = GroqConnector(api_key=api_key)
-                answer = connector.chat(
-                    messages, temperature=temperature, max_tokens=max_tokens
-                )
-                logger.info(
-                    "LLM response generated with Groq (%s; key %d of %d)",
-                    connector.model,
-                    key_number,
-                    len(settings.groq_api_keys),
-                )
-                return answer
-            except Exception as exc:
-                groq_errors.append(f"key {key_number}: {exc}")
-                logger.warning(
-                    "Groq key %d of %d failed; trying the next configured key. Reason: %s",
-                    key_number,
-                    len(settings.groq_api_keys),
-                    exc,
-                )
+    options: dict[str, Any] = {"temperature": temperature, "max_tokens": max_tokens}
+    if response_schema is not None:
+        options["response_schema"] = response_schema
+    last_error: Exception | None = None
+    for key_number, api_key in enumerate(settings.groq_api_keys, start=1):
+        try:
+            connector = GroqConnector(api_key=api_key)
+            answer = connector.chat(messages, **options)
+            logger.info(
+                "LLM response generated with Groq (%s; key %d of %d)",
+                connector.model,
+                key_number,
+                len(settings.groq_api_keys),
+            )
+            return answer
+        except Exception as exc:
+            last_error = exc
+            groq_errors.append(f"key {key_number}: {exc}")
+            logger.warning(
+                "Groq key %d of %d failed. Reason: %s",
+                key_number,
+                len(settings.groq_api_keys),
+                exc,
+            )
 
-    if not settings.use_groq:
-        groq_error = "Groq disabled by USE_GROQ."
-    elif not settings.groq_api_keys:
-        groq_error = "No GROQ_API_KEY or numbered GROQ_API_KEY<n> values are configured."
-    else:
-        groq_error = "; ".join(groq_errors)
-        logger.warning("All configured Groq keys failed; trying local Ollama.")
-
-    try:
-        connector = OllamaConnector()
-        answer = connector.chat(messages, temperature=temperature, max_tokens=max_tokens)
-        logger.info("LLM response generated with Ollama (%s)", connector.chat_model)
-        return answer
-    except Exception as ollama_error:
-        raise LLMError(
-            f"Both configured chat options failed. Groq: {groq_error}; Ollama: {ollama_error}"
-        ) from ollama_error
+    raise LLMError(
+        "Groq chat failed for all configured API keys. " + "; ".join(groq_errors)
+    ) from last_error
 
 
 def extract_json_object(text: str) -> dict[str, Any]:
